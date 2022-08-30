@@ -1,0 +1,72 @@
+<div class="container-fluid">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">Tambah Kelas</h1>
+    </div>
+
+    <form action="<?= base_url('kelas/store') ?>" method="post">
+        <div class="card p-3">
+            <div class="d-flex">
+                <div class="form-group w-50">
+                    <label for="jurusan_id">Nama Jurusan</label>
+                    <select class="form-control" id="jurusan_id" name="jurusan_id" onchange="updateJurusanId()">
+                        <option value="">-- Pilih jurusan --</option>
+                        <?php foreach ($jurusan->result() as $row) : ?>
+                            <option value="<?= $row->id ?>"><?= $row->nama_jurusan; ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                    <div class="text-danger"><?= form_error('jurusan_id'); ?></div>
+                </div>
+                <div class="form-group w-50 ml-2">
+                    <label for="nama_kelas">Nama Kelas</label>
+                    <select class="form-control" id="select_kelas" name="nama_kelas" disabled>
+                        <option value="">-- Pilih kelas --</option>
+                    </select>
+                    <input type="text" class="form-control d-none" name="nama_kelas" id="nama_kelas" placeholder="contoh: XII-1">
+                    <div class="text-danger"><?= form_error('nama_kelas'); ?></div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <a href="<?= base_url() ?>kelas" class="btn btn-danger">Kembali</a>
+                <button type="submit" class="btn btn-primary">Kirim</button>
+            </div>
+
+            <script type="text/javascript">
+                function updateJurusanId() {
+                    let jurusan_id = $('#jurusan_id').val();
+                    if (jurusan_id == null || jurusan_id <= 0) {
+                        $('#select_kelas').removeClass('d-none');
+                        $('#nama_kelas').addClass('d-none');
+                        $('#select_kelas').prop('disabled', true);
+                    } else {
+                        $.ajax({
+                            url: "<?= base_url('kelas/getByIdJurusan/') ?>" + jurusan_id,
+                            dataType: 'json',
+                            method: "get"
+                        }).done(function(res) {
+                            if (res <= 0 || res == null || res.lenght == undefined) {
+                                $('#select_kelas').removeClass('d-none');
+                                $('#nama_kelas').addClass('d-none');
+                                $('#select_kelas').prop('disabled', false);
+
+                                var loop_select = '';
+                                $.each(res, function(key, value) {
+                                    loop_select = loop_select + '<option value="' + value.nama_kelas + '">';
+                                    loop_select = loop_select + value.nama_kelas;
+                                    loop_select = loop_select + '</option>';
+                                })
+                                $('#select_kelas').append(loop_select);
+                            }
+                            if (res >= 0 || res.lenght >= 0) {
+                                $('#select_kelas').addClass('d-none');
+                                $('#nama_kelas').removeClass('d-none');
+
+
+                            }
+                        })
+                    }
+                }
+            </script>
+        </div>
+    </form>
+</div>
