@@ -23,7 +23,10 @@
 
             <div class="form-group">
                 <label for="guru_id">Nama Guru</label>
-                <select class="form-control" name="guru_id">
+                <select class="form-control" name="guru_id" <?= ($guru->num_rows() > 0) ?: 'disabled' ?>>
+                    <?php if ($guru->num_rows() == 0) : ?>
+                        <option>-- Tambah guru baru --</option>
+                    <?php endif; ?>
                     <option value="">-- Pilih guru --</option>
                     <?php foreach ($guru->result() as $row) : ?>
                         <option value="<?= $row->id ?>"><?= $row->nama_guru; ?></option>

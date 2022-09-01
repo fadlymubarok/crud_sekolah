@@ -10,6 +10,10 @@ class Login extends CI_Controller
 
     public function index()
     {
+        if ($this->session->userdata('name') != null || $this->session->userdata('name') == true) {
+            return redirect(base_url());
+        }
+
         $this->load->view('login/login');
     }
 
@@ -38,7 +42,7 @@ class Login extends CI_Controller
                 $this->session->set_flashdata('error', 'username/password salah!');
                 return redirect(base_url('login'));
             }
-            $result = $this->session->set_flashdata('success', 'Login berhasil!');
+            $this->session->set_flashdata('success', 'Login berhasil!');
             return redirect(base_url());
         }
 

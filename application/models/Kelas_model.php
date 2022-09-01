@@ -47,6 +47,10 @@ class Kelas_model extends CI_Model
 
     public function getAllGuru($id = null)
     {
+        $this->db->select(array('guru.id', 'guru.nama_guru'))
+            ->join('user', 'user.guru_id = guru.id')
+            ->where('user.is_admin', '0');
+
         if ($id == null) {
             $this->db->where('status_wali_kelas', '0');
         }
