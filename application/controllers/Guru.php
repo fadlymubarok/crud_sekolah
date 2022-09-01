@@ -5,10 +5,13 @@ class Guru extends CI_Controller
     public function __construct()
     {
         parent::__construct();
-
         $this->load->model('Guru_model');
         $this->load->model('Auth_model');
         $this->Auth_model->cek_login();
+
+        if (!$this->session->userdata('is_admin')) {
+            show_404();
+        }
     }
 
     public function index()

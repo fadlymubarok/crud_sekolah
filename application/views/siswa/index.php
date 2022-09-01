@@ -58,7 +58,21 @@
                             <tr>
                                 <td><?= $no++; ?></td>
                                 <td><?= $row->nama_siswa; ?></td>
-                                <td><?= $row->nama_kelas; ?></td>
+
+                                <?php
+                                $text = explode(" ", $row->nama_jurusan);
+                                $gabung = '';
+
+                                if (count($text) > 1) {
+                                    foreach ($text as $change) {
+                                        $gabung .= substr(strtoupper($change), 0, 1);
+                                    }
+                                } else {
+                                    $gabung = $row->nama_jurusan;
+                                }
+                                ?>
+
+                                <td><?= $gabung . " " . $row->nama_kelas; ?></td>
                                 <td><?= $row->nama_guru; ?></td>
                                 <td>
                                     <a href="<?= base_url('siswa/edit/' . $row->id) ?>" class="btn btn-warning mr-1"><i class="far fa-edit"></i></a>

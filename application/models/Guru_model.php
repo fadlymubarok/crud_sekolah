@@ -4,6 +4,9 @@ class Guru_model extends CI_Model
 {
     public function getAll()
     {
+        $this->db->select('*')
+            ->join('user', 'user.guru_id = guru.id')
+            ->where('user.is_admin', '0');
         $data = $this->db->get('guru');
         return $data;
     }

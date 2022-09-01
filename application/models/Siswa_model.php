@@ -4,20 +4,26 @@ class Siswa_model extends CI_Model
 {
     public function getAll()
     {
-        $this->db->select(array('siswa.*', 'kelas.nama_kelas', 'guru.nama_guru'));
+        $this->db->select(array('siswa.id', 'siswa.nama_siswa', 'kelas.nama_kelas', 'jurusan.nama_jurusan', 'guru.nama_guru'));
         $this->db->join('kelas', 'siswa.kelas_id = kelas.id');
         $this->db->join('guru', 'kelas.guru_id = guru.id');
+        $this->db->join('jurusan', 'kelas.jurusan_id = jurusan.id');
+        $this->db->where('kelas.guru_id', $this->session->userdata('id'));
         $result = $this->db->get('siswa');
         return $result;
     }
-    public function store()
+    public function store($data)
     {
-        $data = array(
-            'nama_siswa' => $this->input->post('nama_siswa'),
-            'tgl_lahir_siswa' => Date($this->input->post('tgl_lahir_siswa')),
-            'alamat_siswa' => $this->input->post('alamat_siswa'),
-            'kelas_id' => $this->input->post('kelas_id')
+        $query = $this->db->query(
+            'SELECT kelas.id
+            FROM `guru` 
+            INNER JOIN kelas on kelas.guru_id = guru.id
+            where guru.id = ' . $this->session->userdata('id')
+        );
+        $query = $query->row();
 
+        $data += array(
+            'kelas_id' => $query->id
         );
         return $this->db->insert('siswa', $data);
     }
@@ -34,27 +40,8 @@ class Siswa_model extends CI_Model
         return $data;
     }
 
-    public function update($id)
+    public function update($id, $new_data)
     {
-        $old_data = $this->getById($id);
-        if ($old_data == null) {
-            return null;
-        }
-
-        $tgl_lahir = '';
-        if ($this->input->post('tgl_lahir_siswa') == '' || $this->input->post('tgl_lahir_siswa') == null) {
-            $tgl_lahir = $old_data->tgl_lahir_siswa;
-        } else {
-            $tgl_lahir = Date($this->input->post('tgl_lahir_siswa'));
-        }
-
-        $new_data = array(
-            'nama_siswa' => $this->input->post('nama_siswa'),
-            'tgl_lahir_siswa' => $tgl_lahir,
-            'alamat_siswa' => $this->input->post('alamat_siswa'),
-            'kelas_id' => $this->input->post('kelas_id')
-        );
-
         $this->db->where('id', $id);
         return $this->db->update('siswa', $new_data);
     }

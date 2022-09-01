@@ -9,6 +9,10 @@ class Siswa extends CI_Controller
         $this->load->model('Siswa_model');
         $this->load->model('Auth_model');
         $this->Auth_model->cek_login();
+
+        if ($this->session->userdata('is_admin')) {
+            show_404();
+        }
     }
 
     public function index()
@@ -48,16 +52,17 @@ class Siswa extends CI_Controller
                 'field' => 'alamat_siswa',
                 'label' => 'alamat_siswa',
                 'rules' => 'required'
-            ),
-            array(
-                'field' => 'kelas_id',
-                'label' => 'kelas_id',
-                'rules' => 'required'
             )
         ));
 
         if ($this->form_validation->run()) {
-            $this->Siswa_model->store();
+            $data = array(
+                'nama_siswa' => $this->input->post('nama_siswa'),
+                'tgl_lahir_siswa' => Date($this->input->post('tgl_lahir_siswa')),
+                'alamat_siswa' => $this->input->post('alamat_siswa')
+            );
+
+            $result = $this->Siswa_model->store($data);
             $this->session->set_flashdata('success', 'Data siswa berhasil ditambahkan!');
             return redirect(base_url('siswa'));
         }
@@ -111,21 +116,30 @@ class Siswa extends CI_Controller
                 'field' => 'alamat_siswa',
                 'label' => 'alamat_siswa',
                 'rules' => 'required'
-            ),
-            array(
-                'field' => 'kelas_id',
-                'label' => 'kelas_id',
-                'rules' => 'required'
             )
         ));
 
         if ($this->form_validation->run()) {
-            $result = $this->Siswa_model->update($id);
-            // if ($result == null) {
-            //     $this->session->set_flashdata('error', 'Data tidak ada!');
-            //     return redirect(base_url('siswa/edit/' . $id));
-            // }
-            // die;
+            $old_data = $this->Siswa_model->getById($id);
+            if ($old_data == null) {
+                $this->session->set_flashdata('error', 'Data gagal diupdate!');
+                return redirect(base_url('siswa'));
+            }
+
+            $tgl_lahir = '';
+            if ($this->input->post('tgl_lahir_siswa') == '' || $this->input->post('tgl_lahir_siswa') == null) {
+                $tgl_lahir = $old_data->tgl_lahir_siswa;
+            } else {
+                $tgl_lahir = Date($this->input->post('tgl_lahir_siswa'));
+            }
+
+            $new_data = array(
+                'nama_siswa' => $this->input->post('nama_siswa'),
+                'tgl_lahir_siswa' => $tgl_lahir,
+                'alamat_siswa' => $this->input->post('alamat_siswa')
+            );
+
+            $this->Siswa_model->update($id, $new_data);
 
             $this->session->set_flashdata('update', 'Data berhasil diupdate!');
             return redirect(base_url('siswa'));
